@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: retina
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
