@@ -1,0 +1,25 @@
+{
+  "source": "https://hormouz.net/models",
+  "retrievedAt": "2026-11-22",
+  "unit": "USD_PER_MILLION_TOKENS",
+  "note": "Tariff-based cost, not a confirmed account charge. Cache pricing unavailable unless supplied separately. Promotions can change.",
+  "models": {
+    "anthropic/claude-sonnet-5.5": {
+      "input": 1.2,
+      "output": 6,
+      "source": "https://hormouz.net/models/anthropic/claude-sonnet-5.5",
+      "discount": "-40%"
+    },
+    "openai/gpt-6.1-sol": {
+      "input": 2,
+      "output": 10,
+      "source": "https://hormouz.net/models/openai/gpt-6.1-sol"
+    },
+    "google/gemini-3.8-flash": {
+      "input": 0.825,
+      "output": 4.125,
+      "source": "https://hormouz.net/models/google/gemini-3.8-flash",
+      "discount": "-50%"
+    }
+  }
+}
