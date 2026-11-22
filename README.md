@@ -2,7 +2,7 @@
 
 Retina is an agentic software-development orchestration project. Its planned workflow connects Jira issues, OpenCode workers backed by OpenRouter, and Gerrit review.
 
-> Status: bootstrap in progress. Token analytics are implemented as a read-only Node.js module and CLI. Jira, Gerrit, model execution, and automated review are **not connected yet**.
+> Status: bootstrap in progress. Token analytics include an OpenCode v2 event collector, local read-only dashboard and CLI reports. Jira, Gerrit and unattended orchestration are **not connected yet**.
 
 ## Principles
 
@@ -32,3 +32,7 @@ See [local setup](docs/local-setup.md). OpenCode custom provider and Discovery/P
 ## Role-specific models
 
 Each Retina Agent has its own Hormouz model alias. Configure upstream models locally with `npm run models -- list` and `npm run models -- set coder PROVIDER/MODEL-ID`. Preferences stay in ignored `.retina/role-models.json`, and the local wrapper resolves them at startup. See [local setup](docs/local-setup.md). Until a role is configured, it uses `anthropic/claude-sonnet-5.5`. No automatic model selection, cost routing, or upstream availability check is implied.
+
+## Live Observability dashboard
+
+In one terminal run `npm run dashboard`, and open http://127.0.0.1:4318. In another terminal run `npm run local:opencode`. OpenCode v2 automatically records sanitized model-step usage and measured timing in `.retina/telemetry/events.ndjson`. Bind a session to a Jira task with `npm run task -- bind SESSION_ID IRIS-123 BUG_FIX 3 R2`. See [Live Observability](docs/live-observability.md). A real authenticated Hormouz call must still be tested on your computer.
