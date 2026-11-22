@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "hormoz/coding",
+  "default_agent": "discovery",
+  "providers": {
+    "hormoz": {
+      "name": "Hormoz AI",
+      "env": [
+        "HORMOZ_API_KEY"
+      ],
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "{env:HORMOZ_BASE_URL}"
+      },
+      "models": {
+        "coding": {
+          "name": "Configured coding model",
+          "modelID": "{env:HORMOZ_MODEL_ID}"
+        }
+      }
+    }
+  }
+}
