@@ -4,6 +4,7 @@ import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import http from 'node:http';
 import { normalizeOpenCodeEvent } from '../src/opencode-event-adapter.js';
 import { appendTelemetry, readTelemetry, readBindings, updateBindings, validateBinding, eventsFile, bindingsFile } from '../src/telemetry-store.js';
 import { dashboardReport } from '../src/live-telemetry.js';
@@ -109,7 +110,10 @@ test('dashboard serves real aggregated data on loopback and rejects unsafe hosts
     assert.equal((await fetch(base+'/dashboard.js')).status,200);
     assert.equal((await fetch(base+'/api/report?groupBy=__proto__')).status,400);
     assert.equal((await fetch(base+'/api/report',{method:'POST'})).status,405);
-    assert.equal((await fetch(base+'/api/report',{headers:{Host:'attacker.example'}})).status,403);
+    const hostileStatus=await new Promise((resolve,reject)=>{
+      http.get(base+'/api/report',{headers:{host:'attacker.example'}},response=>{response.resume();resolve(response.statusCode);}).on('error',reject);
+    });
+    assert.equal(hostileStatus,403);
   }finally{
     await new Promise(resolve=>srv.close(resolve));
     rmSync(root,{recursive:true,force:true});
