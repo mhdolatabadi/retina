@@ -1,0 +1,460 @@
+{
+  "uid": "retina-usage",
+  "title": "Retina · Agent Token and Hormouz Cost",
+  "tags": [
+    "retina",
+    "agents",
+    "hormouz"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "graphTooltip": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "کل توکن‌های Retina",
+      "type": "stat",
+      "description": "جمع توکن‌های ثبت‌شده برای اجراهای تأییدشده Retina",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(retina_tokens_total)",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 2,
+      "title": "هزینه تعرفه‌ای Hormouz (USD)",
+      "type": "stat",
+      "description": "محاسبه‌شده براساس تعرفه رسمی، نه مبلغ قطعی تسویه‌شده",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(retina_hormouz_tariff_usd_total)",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "title": "درخواست‌های بدون هزینه قابل‌محاسبه",
+      "type": "stat",
+      "description": "نرخ Cache یا داده مصرف کافی موجود نیست",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(retina_unpriced_requests_total)",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 4,
+      "title": "توکن به تفکیک نقش",
+      "type": "barchart",
+      "description": "Discovery, PM, Orchestrator, Coder, Reviewer 1, Reviewer 2",
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (role) (retina_tokens_total)",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "هزینه به تفکیک نقش",
+      "type": "barchart",
+      "description": "USD based on Hormouz published rates",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (role) (retina_hormouz_tariff_usd_total)",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "توکن به تفکیک نوع تسک",
+      "type": "barchart",
+      "description": "",
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (task_type) (retina_tokens_total)",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "توکن به تفکیک Jira Issue",
+      "type": "barchart",
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(20, sum by (issue) (retina_tokens_total))",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "سرعت مصرف توکن (در دقیقه)",
+      "type": "timeseries",
+      "description": "",
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (role) (rate(retina_tokens_total[5m])) * 60",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "مصرف به تفکیک مدل",
+      "type": "barchart",
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (model) (retina_tokens_total)",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "درخواست‌ها به تفکیک نقش",
+      "type": "barchart",
+      "description": "",
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "retina-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (role) (retina_model_requests_total)",
+          "legendFormat": "{{role}} {{model}} {{task_type}} {{issue}}",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    }
+  ]
+}

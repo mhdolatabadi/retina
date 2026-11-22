@@ -36,3 +36,7 @@ Each Retina Agent has its own Hormouz model alias. Configure upstream models loc
 ## Live Observability dashboard
 
 In one terminal run `npm run dashboard`, and open http://127.0.0.1:4318. In another terminal run `npm run local:opencode`. OpenCode v2 automatically records sanitized model-step usage and measured timing in `.retina/telemetry/events.ndjson`. Bind a session to a Jira task with `npm run task -- bind SESSION_ID IRIS-123 BUG_FIX 3 R2`. See [Live Observability](docs/live-observability.md). A real authenticated Hormouz call must still be tested on your computer.
+
+## Grafana Observability (recommended)
+
+Run-scoped telemetry now excludes unrelated corporate OpenCode sessions. The primary monitoring stack is provisioned Grafana + Prometheus, with token usage and Hormouz tariff-cost charts by agent role, model, Jira issue and task type. Add GRAFANA_ADMIN_PASSWORD to ignored .env and run: docker compose -f compose.grafana.yml up -d. Open http://127.0.0.1:3000. More: [Grafana Observability](docs/grafana-observability.md). Tariff costs are not settled bills; missing cache prices are not invented.

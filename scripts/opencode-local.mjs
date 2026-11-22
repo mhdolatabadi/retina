@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readRoleModelOverrides, buildRoleModelConfig } from '../src/role-models.js';
+import { registerRetinaRun } from '../src/retina-scope.js';
 
 const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -17,12 +18,15 @@ try {
   mkdirSync(directory, { recursive: true, mode: 0o700 });
   const runtimePath = path.join(directory, 'opencode.runtime.json');
   writeFileSync(runtimePath, JSON.stringify(config, null, 2) + '\n', { mode: 0o600 });
+  const retinaRunId = registerRetinaRun(project, path.resolve(cwd));
   const child = spawn('opencode', args.length ? args : ['--standalone'], {
     cwd, shell: false, stdio: 'inherit',
     env: {
       ...process.env,
       OPENCODE_CONFIG: runtimePath,
-      OPENCODE_CONFIG_DIR: path.join(project, '.opencode')
+      OPENCODE_CONFIG_DIR: path.join(project, '.opencode'),
+      RETINA_RUN_ID: retinaRunId,
+      RETINA_TELEMETRY_WORKSPACE: path.resolve(cwd)
     }
   });
   child.once('error', error => {

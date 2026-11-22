@@ -9,6 +9,7 @@ import { normalizeOpenCodeEvent } from '../src/opencode-event-adapter.js';
 import { appendTelemetry, readTelemetry, readBindings, updateBindings, validateBinding, eventsFile, bindingsFile } from '../src/telemetry-store.js';
 import { dashboardReport } from '../src/live-telemetry.js';
 import { createDashboardServer } from '../src/dashboard-server.js';
+import { registerRetinaRun } from '../src/retina-scope.js';
 
 const sessionID='ses_example', assistantMessageID='msg_100';
 const event = (type,data={}) => ({type,data:{sessionID,assistantMessageID,...data}});
@@ -41,7 +42,8 @@ test('real OpenCode step event aggregate: measured total, first token and genera
   assert.equal(r.overview.ttftMeanMs,1000);
   assert.equal(r.overview.requests,1);
   assert.equal(r.groups[0].name,'anthropic/claude-sonnet-5.5');
-  assert.equal(r.overview.costUSD,0.01);
+  assert.equal(r.overview.costUSD,null);
+  assert.equal(r.overview.opencodeReportedUSD,0.01);
   assert.equal(r.sessions[0].issueKey,'UNATTRIBUTED');
 });
 test('duplicate terminal delivery never double counts',()=>{
@@ -96,7 +98,8 @@ test('dashboard serves real aggregated data on loopback and rejects unsafe hosts
   const root=mkdtempSync(path.join(os.tmpdir(),'retina-dashboard-'));
   const srv=createDashboardServer({projectRoot:root,port:0});
   try{
-    for(const row of sampled()) appendTelemetry(eventsFile(root),row);
+    const runId=registerRetinaRun(root,root);
+    for(const row of sampled()) appendTelemetry(eventsFile(root),{...row,retinaRunId:runId});
     updateBindings(bindingsFile(root),{ses_example:validateBinding('ses_example','IRIS-1','BUG_FIX',3)});
     await new Promise(resolve=>srv.listen(0,'127.0.0.1',resolve));
     const base='http://127.0.0.1:'+srv.address().port;

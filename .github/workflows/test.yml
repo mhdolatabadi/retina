@@ -12,3 +12,7 @@ jobs:
         with:
           node-version: '22'
       - run: npm test
+      - name: Validate Grafana Compose
+        env:
+          GRAFANA_ADMIN_PASSWORD: ci-placeholder-only
+        run: docker compose -f compose.grafana.yml config --quiet

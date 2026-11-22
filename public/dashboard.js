@@ -35,7 +35,7 @@ function render(report) {
   $('rate').textContent=n(o.tokensPerActiveMinute);
   $('decode').textContent=n(o.generationTokensPerSecond);
   $('requests').textContent=n(o.requests);
-  $('request-detail').textContent=n(o.completed)+' کامل · '+n(o.running)+' درحال اجرا · '+n(o.missingUsage)+' ناقص';
+  $('request-detail').textContent=n(o.completed)+' کامل · '+n(o.running)+' درحال اجرا · '+n(o.missingUsage)+' ناقص · '+n(o.tariffUnpricedRequests)+' بدون تعرفه قابل محاسبه';
   $('ttft').textContent=n(o.ttftMeanMs);
   $('cost').textContent=o.costUSD===null ? '—' : '$'+n(o.costUSD);
   $('updated').textContent=new Date(report.updatedAt).toLocaleTimeString('fa-IR');
@@ -68,7 +68,7 @@ function render(report) {
     s=>s.sessionID,s=>s.issueKey,s=>s.taskType,s=>n(s.requests),
     s=>s.lastSeen ? new Date(s.lastSeen).toLocaleString('fa-IR') : '—'
   ]);
-  $('message').textContent='داده هر ۳ ثانیه به‌روزرسانی می‌شود. شمارنده‌های ناموجود به‌عنوان «—» نمایش داده می‌شوند، نه صفر.';
+  $('message').textContent='داده هر ۳ ثانیه به‌روزرسانی می‌شود. هزینه از تعرفه‌های هرمز محاسبه می‌شود، نه از قیمت عمومی مدل‌ها؛ هزینه نامعلوم «—» است.';
 }
 let fetching=false;
 async function refresh(){

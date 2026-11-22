@@ -1,3 +1,5 @@
+import { activeRetinaRuns, onlyRetinaEvents } from './retina-scope.js';
+import { readHormouzPrices } from './hormouz-pricing.js';
 import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -51,10 +53,10 @@ export function createDashboardServer({ projectRoot = root, port = 4318 } = {}) 
           if(value) filters[key]=value;
         }
         const report=dashboardReport(
-          readTelemetry(eventsFile(projectRoot)),
+          onlyRetinaEvents(readTelemetry(eventsFile(projectRoot)),activeRetinaRuns(projectRoot)),
           readBindings(bindingsFile(projectRoot)),
           modelCatalog(projectRoot),
-          {groupBy,filters}
+          {groupBy,filters,pricing:readHormouzPrices(root)}
         );
         res.writeHead(200, {'Content-Type':'application/json; charset=utf-8'});
         res.end(JSON.stringify(report));
