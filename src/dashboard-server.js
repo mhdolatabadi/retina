@@ -16,7 +16,7 @@ const types = { '/':'text/html; charset=utf-8','/dashboard.js':'text/javascript;
 function modelCatalog(project) {
   let config;
   try { config = JSON.parse(readFileSync(path.join(project,'.retina','opencode.runtime.json'),'utf8')); }
-  catch { config = JSON.parse(readFileSync(path.join(project,'opencode.json'),'utf8')); }
+  catch { config = JSON.parse(readFileSync(path.join(root,'opencode.json'),'utf8')); }
   return Object.fromEntries(Object.entries(config.providers?.hormoz?.models ?? {}).map(([id,value])=>[id,value.modelID]));
 }
 
