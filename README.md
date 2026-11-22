@@ -24,3 +24,7 @@ node src/report.js --state /path/to/state.json --report tasks
 ```
 
 See [token observability](docs/token-observability.md). Live provider ingestion and the complete Jira-to-Gerrit runner are separate integration work.
+
+## Local OpenCode setup (Hormoz AI)
+
+See [local setup](docs/local-setup.md). OpenCode custom provider and Discovery/Project Manager/Orchestrator/Coder/Reviewer roles are configured. A real Hormoz base URL and model ID must be supplied locally. This is not yet an unattended Jira-to-Gerrit delivery service.

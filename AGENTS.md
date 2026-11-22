@@ -1,0 +1,3 @@
+# Retina Engineering Context
+
+Retina accelerates execution without taking product, UX, architecture, or risk-acceptance authority from humans. Ask rather than assume. Keep context focused: locate only relevant files. Code changes must preserve established style and Checkstyle and include efficient, relevant automated tests with regression tests for fixed defects. Use the simplest correct implementation, without speculative scope expansion. The project's existing coding rules take precedence. Task assignment, Jira readiness, risk governance and Gerrit reviews are external workflow policies, not coding instructions. Never report a tool action as successful without confirmation.
