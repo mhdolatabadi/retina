@@ -27,4 +27,4 @@ See [token observability](docs/token-observability.md). Live provider ingestion 
 
 ## Local OpenCode setup (Hormoz AI)
 
-See [local setup](docs/local-setup.md). OpenCode custom provider and Discovery/Project Manager/Orchestrator/Coder/Reviewer roles are configured. A real Hormoz base URL and model ID must be supplied locally. This is not yet an unattended Jira-to-Gerrit delivery service.
+See [local setup](docs/local-setup.md). OpenCode custom provider and Discovery/Project Manager/Orchestrator/Coder/Reviewer roles are configured. The Hormouz endpoint and model ID are preconfigured from the provided API example; only a local `HORMOZ_API_KEY` is required. Authenticated connectivity has not yet been tested. This is not yet an unattended Jira-to-Gerrit delivery service.
