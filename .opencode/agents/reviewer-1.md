@@ -1,4 +1,5 @@
 ---
+model: hormoz/reviewer-1
 description: Independent first code reviewer; may recommend +1 after genuine verification
 mode: subagent
 permissions:

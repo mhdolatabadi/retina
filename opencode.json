@@ -16,6 +16,30 @@
         "sonnet": {
           "name": "Claude Sonnet 5.5 (Hormouz AI)",
           "modelID": "anthropic/claude-sonnet-5.5"
+        },
+        "discovery": {
+          "name": "Retina Discovery",
+          "modelID": "anthropic/claude-sonnet-5.5"
+        },
+        "project-manager": {
+          "name": "Retina Project Manager",
+          "modelID": "anthropic/claude-sonnet-5.5"
+        },
+        "orchestrator": {
+          "name": "Retina Orchestrator",
+          "modelID": "anthropic/claude-sonnet-5.5"
+        },
+        "coder": {
+          "name": "Retina Coder",
+          "modelID": "anthropic/claude-sonnet-5.5"
+        },
+        "reviewer-1": {
+          "name": "Retina Reviewer 1",
+          "modelID": "anthropic/claude-sonnet-5.5"
+        },
+        "reviewer-2": {
+          "name": "Retina Reviewer 2",
+          "modelID": "anthropic/claude-sonnet-5.5"
         }
       }
     }

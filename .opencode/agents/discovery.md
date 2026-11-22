@@ -1,4 +1,5 @@
 ---
+model: hormoz/discovery
 description: Clarifies the human's requirements and design without making product decisions
 mode: primary
 ---

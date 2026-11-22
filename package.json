@@ -10,6 +10,7 @@
     "test": "node --test test/*.test.js",
     "usage": "node src/report.js",
     "local:doctor": "node --env-file=.env scripts/doctor-local.mjs",
-    "local:opencode": "node --env-file=.env scripts/opencode-local.mjs"
+    "local:opencode": "node --env-file=.env scripts/opencode-local.mjs",
+    "models": "node scripts/models-local.mjs"
   }
 }

@@ -1,4 +1,5 @@
 ---
+model: hormoz/coder
 description: Implements a defined change with tests and self-verification
 mode: subagent
 ---
