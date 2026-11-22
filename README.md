@@ -28,3 +28,7 @@ See [token observability](docs/token-observability.md). Live provider ingestion 
 ## Local OpenCode setup (Hormoz AI)
 
 See [local setup](docs/local-setup.md). OpenCode custom provider and Discovery/Project Manager/Orchestrator/Coder/Reviewer roles are configured. The Hormouz endpoint and model ID are preconfigured from the provided API example; only a local `HORMOZ_API_KEY` is required. Authenticated connectivity has not yet been tested. This is not yet an unattended Jira-to-Gerrit delivery service.
+
+## Role-specific models
+
+Each Retina Agent has its own Hormouz model alias. Configure upstream models locally with `npm run models -- list` and `npm run models -- set coder PROVIDER/MODEL-ID`. Preferences stay in ignored `.retina/role-models.json`, and the local wrapper resolves them at startup. See [local setup](docs/local-setup.md). Until a role is configured, it uses `anthropic/claude-sonnet-5.5`. No automatic model selection, cost routing, or upstream availability check is implied.

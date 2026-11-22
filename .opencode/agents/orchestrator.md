@@ -1,4 +1,5 @@
 ---
+model: hormoz/orchestrator
 description: Coordinates a single task's readiness, implementation and reviews
 mode: primary
 ---

@@ -1,4 +1,5 @@
 ---
+model: hormoz/reviewer-2
 description: Independent second code reviewer; checks eligibility for +2 after first +1
 mode: subagent
 permissions:

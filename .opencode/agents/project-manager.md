@@ -1,4 +1,5 @@
 ---
+model: hormoz/project-manager
 description: Turns approved specifications into complete Jira-ready tasks
 mode: primary
 ---
