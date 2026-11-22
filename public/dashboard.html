@@ -19,7 +19,7 @@
     <div class="filters">
       <label>گروه‌بندی<select id="groupBy">
       <option value="taskType">نوع تسک</option><option value="issue">Jira Issue</option>
-      <option value="model">مدل</option><option value="agent">Agent</option>
+      <option value="model">مدل</option><option value="role">نقش Agent</option><option value="agent">Agent</option>
       <option value="stage">مرحله</option><option value="orchestrator">Orchestrator</option>
       <option value="risk">سطح ریسک</option><option value="status">وضعیت</option>
       </select></label>
@@ -36,7 +36,7 @@
       <article class="kpi"><span>سرعت تولید مدل</span><strong id="decode">—</strong><small>توکن خروجی / ثانیه تولید</small></article>
       <article class="kpi"><span>درخواست‌های مدل</span><strong id="requests">—</strong><small id="request-detail">کامل / درحال اجرا / ناقص</small></article>
       <article class="kpi"><span>میانگین اولین توکن</span><strong id="ttft">—</strong><small>میلی‌ثانیه · TTFT</small></article>
-      <article class="kpi"><span>هزینه گزارش‌شده</span><strong id="cost">—</strong><small>USD · اگر توسط OpenCode ارائه شود</small></article>
+      <article class="kpi"><span>هزینه محاسبه‌شده با تعرفه هرمز</span><strong id="cost">—</strong><small>USD · تعرفه رسمی، نه مبلغ تسویه‌شده</small></article>
     </section>
     <section class="two">
       <article class="panel"><div class="panel-heading"><div><p class="eyebrow">BREAKDOWN</p><h2>مصرف بر اساس گروه</h2></div></div><div id="bars" class="bars"></div></article>

@@ -1,20 +1,22 @@
+import { calculateHormouzTariff } from './hormouz-pricing.js';
 const num = v => typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null;
 const ts = v => typeof v === 'string' && Number.isFinite(Date.parse(v)) ? Date.parse(v) : null;
 const round = v => v === null || !Number.isFinite(v) ? null : Math.round(v * 100) / 100;
 const keys = ['inputTokens','outputTokens','reasoningTokens','cacheReadTokens','cacheWriteTokens'];
 const field = {
-  issue: 'issueKey', taskType: 'taskType', stage: 'stage', agent: 'agentId',
+  issue: 'issueKey', taskType: 'taskType', stage: 'stage', agent: 'agentId', role: 'role',
   model: 'upstreamModel', orchestrator: 'orchestratorId', risk: 'risk', status: 'status'
 };
 export const allowedGroups = Object.keys(field);
 
-function enrich(step, bindings, models) {
+function enrich(step, bindings, models, pricing) {
   const bound = bindings[step.sessionID] ?? {};
   const meta = step.task ?? {};
   const attrs = { ...meta, ...bound };
   const alias = step.provider && step.model ? step.provider + '/' + step.model : 'UNKNOWN';
-  return {
+  const output = {
     ...step, ...attrs,
+    role: step.agentId || 'UNKNOWN',
     issueKey: attrs.issueKey || 'UNATTRIBUTED',
     taskType: attrs.taskType || 'UNATTRIBUTED',
     stage: step.stage || step.agentId || 'UNKNOWN',
@@ -22,14 +24,16 @@ function enrich(step, bindings, models) {
     risk: attrs.risk || 'UNKNOWN',
     upstreamModel: models[step.model] || alias
   };
+  output.tariff = pricing ? calculateHormouzTariff(output, pricing) : null;
+  return output;
 }
 
-export function stepsFromEvents(events, bindings = {}, models = {}) {
+export function stepsFromEvents(events, bindings = {}, models = {}, pricing = null) {
   const map = new Map();
   for (const event of events) {
     if (!event || !event.sessionID || !event.messageID) continue;
-    const id = event.sessionID + '|' + event.messageID;
-    if (!map.has(id)) map.set(id, { sessionID: event.sessionID, messageID: event.messageID, status: 'RUNNING' });
+    const id = (event.retinaRunId || 'legacy') + '|' + event.sessionID + '|' + event.messageID;
+    if (!map.has(id)) map.set(id, { retinaRunId:event.retinaRunId || null, sessionID: event.sessionID, messageID: event.messageID, status: 'RUNNING' });
     const step = map.get(id);
     switch (event.kind) {
       case 'started':
@@ -56,7 +60,7 @@ export function stepsFromEvents(events, bindings = {}, models = {}) {
         break;
     }
   }
-  return [...map.values()].map(step => enrich(step, bindings, models));
+  return [...map.values()].map(step => enrich(step, bindings, models, pricing));
 }
 
 function summary(rows) {
@@ -79,14 +83,19 @@ function summary(rows) {
   const generating = generation.reduce((sum,s) => sum + s.outputTokens + s.reasoningTokens,0);
   const ttft = complete.map(s => ts(s.firstTokenAt) !== null && ts(s.startedAt) !== null
     ? ts(s.firstTokenAt) - ts(s.startedAt) : null).filter(t => t !== null && t >= 0);
-  const priced = done.filter(s => num(s.cost) !== null);
+  const priced = done.filter(s => num(s.tariff?.usd) !== null);
+  const reported = done.filter(s => num(s.cost) !== null);
   const uniqueIssues = new Set(rows.map(s=>s.issueKey).filter(k=>k!=='UNATTRIBUTED'));
   const tasksWithComplete = new Set(complete.map(s=>s.issueKey).filter(k=>k!=='UNATTRIBUTED'));
   return {
     requests: rows.length, completed: complete.length, failed: done.filter(s=>s.status==='FAILED').length,
     running: rows.filter(s=>s.status==='RUNNING').length, missingUsage: done.length - complete.length,
     uniqueTasks: uniqueIssues.size, tokens: {...counts,total},
-    costUSD: priced.length ? round(priced.reduce((a,s)=>a+s.cost,0)) : null,
+    costUSD: done.length && priced.length===done.length ? Math.round(priced.reduce((a,s)=>a+s.tariff.usd,0)*1e8)/1e8 : null,
+    tariffPricedRequests: priced.length,
+    tariffUnpricedRequests: done.length-priced.length,
+    billingVerifiedUSD: null,
+    opencodeReportedUSD: reported.length===done.length && done.length ? Math.round(reported.reduce((a,s)=>a+s.cost,0)*1e8)/1e8 : null,
     activeMs,
     wallMs,
     tokensPerActiveMinute: total !== null && complete.length===done.length && completeTimes.length===complete.length && activeMs > 0
@@ -116,7 +125,7 @@ export function dashboardReport(events, bindings = {}, models = {}, opts = {}) {
   if (!allowedGroups.includes(groupBy)) throw Error('Invalid grouping dimension');
   const filters = opts.filters || {};
   for (const name of Object.keys(filters)) if (!field[name] && name!=='since' && name!=='until') throw Error('Invalid filter');
-  const all = stepsFromEvents(events, bindings, models);
+  const all = stepsFromEvents(events, bindings, models, opts.pricing || null);
   const rows = all.filter(s=>keep(s,filters));
   const groups = new Map();
   for(const row of rows) {
@@ -142,6 +151,6 @@ export function dashboardReport(events, bindings = {}, models = {}, opts = {}) {
     groups:[...groups].map(([name,items])=>({name,...summary(items)})).sort((a,b)=>(b.tokens.total??0)-(a.tokens.total??0)),
     trend:[...trend].sort(([a],[b])=>a.localeCompare(b)).slice(-72).map(([time,tokens])=>({time,tokens})),
     sessions:[...sessions.values()].sort((a,b)=>(b.lastSeen||'').localeCompare(a.lastSeen||'')).slice(0,100),
-    note:'Usage is captured from OpenCode v2 step events. Live measurements are local, not estimated.'
+    note:'Scoped OpenCode v2 usage. Cost is calculated from the published Hormouz tariff and is not a settled invoice.'
   };
 }
