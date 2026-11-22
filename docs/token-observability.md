@@ -33,3 +33,7 @@ node src/report.js --state path/to/state.json --report tasks
 State format: `{ "usage": [ { "issueKey":"PROJ-123", "taskType":"Bug", "storyPoints":3, "agentId":"coder", "stage":"IMPLEMENTATION", "model":"...", "inputTokens":100, "outputTokens":20, "durationMs":1500, "startedAt":"2026-11-21T10:00:00Z" } ], "tasks": [] }`.
 
 This code provides **read-only analytics on recorded measurements**. End-to-end live OpenCode/OpenRouter ingestion and a visual dashboard are not part of this PR. Do not commit runtime state, prompts, provider secrets, or private customer data.
+
+## Live automatic collection
+
+The state-file report above remains for compatibility. For automatic OpenCode v2 event ingestion, measured generation speed and the localhost dashboard, see [Live Observability](live-observability.md). The v2 dashboard follows the v2 schema and counts disjoint reasoning and cache categories once, whereas the older static report retains its previous generic accounting semantics.
