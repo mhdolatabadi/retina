@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "hormoz/coding",
+  "model": "hormoz/sonnet",
   "default_agent": "discovery",
   "providers": {
     "hormoz": {
@@ -10,12 +10,12 @@
       ],
       "package": "@opencode/ai/providers/openai-compatible",
       "settings": {
-        "baseURL": "{env:HORMOZ_BASE_URL}"
+        "baseURL": "https://api.hormouz.net/v1"
       },
       "models": {
-        "coding": {
-          "name": "Configured coding model",
-          "modelID": "{env:HORMOZ_MODEL_ID}"
+        "sonnet": {
+          "name": "Claude Sonnet 5.5 (Hormouz AI)",
+          "modelID": "anthropic/claude-sonnet-5.5"
         }
       }
     }
