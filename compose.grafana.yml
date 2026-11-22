@@ -1,0 +1,41 @@
+name: retina-observability
+services:
+  retina-metrics:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", "src/prometheus-server.js"]
+    volumes: ["./:/app:ro"]
+    restart: unless-stopped
+    networks: [metrics]
+    expose: ["9401"]
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+  prometheus:
+    image: prom/prometheus:v3.7.0
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=30d"]
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks: [metrics]
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:12.2.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in .env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SERVER_ROOT_URL: http://127.0.0.1:3000
+    ports: ["127.0.0.1:3000:3000"]
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks: [metrics]
+    restart: unless-stopped
+    depends_on: [prometheus]
+networks:
+  metrics:
+    internal: true
+volumes:
+  grafana-data:
+  prometheus-data:
