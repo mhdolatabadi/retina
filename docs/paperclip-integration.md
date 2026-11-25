@@ -1,80 +1,59 @@
-# Run Retina inside Paperclip
+# Retina specialists inside Paperclip — ChatGPT Plus default
 
-Paperclip is the **sole manager** of agent scheduling, budgets, tasks, and run lifecycle. Retina supplies specialized role prompts, model routing and development standards. Do not create a second CEO or Orchestrator service.
+Paperclip retains the **existing CEO**, scheduling, task assignment and spending/usage visibility. Retina contributes its six specialist agent roles and engineering rules. It does not create another CEO or scheduler.
 
-## Roles
+## Connect ChatGPT Plus to Paperclip
 
-- Keep your existing Paperclip **CEO**. This agent receives your instructions and delegates tasks.
-- Add six specialist Paperclip agents: Retina Discovery, Retina Project Manager, Retina Orchestrator, Retina Coder, Retina Reviewer 1, Retina Reviewer 2.
-- Retina Orchestrator handles a task's technical progress, not a second scheduler. Paperclip still assigns and wakes agents.
-- Jira controls approved acceptance criteria and Story Points where integrated; Gerrit controls actual patch-set votes and merge. These integrations are not automatically installed by this setup.
-- Humans approve product decisions, architecture changes and high-risk merges.
+1. Install Codex CLI on the host running Paperclip: `npm install -g @openai/codex`. Current Paperclip versions require Node.js 24+ and Python 3 for subscription login.
+2. Open **Paperclip → Connectors → OpenAI → Subscription**. Sign in via the one-time device code in the browser, then click **Connect**. This uses your ChatGPT Plus Codex entitlement. It is not an OpenAI API key.
+3. In the saved OpenAI connector, give the Retina agents permission to use that connection (personal default or an explicitly selected compatible connection). Make sure there is a responsible human user for runs.
+4. Check **Usage → Check usage**. All workers using the same Plus account share its limits; no API per-token charge is imposed on subscription runs, but they consume quota.
 
-## Prerequisites
-
-1. A running **local Paperclip** installation and an authenticated `paperclipai` CLI on the same Mac as the OpenCode runtime.
-2. Existing company ID and CEO agent ID: `paperclipai agent list --company-id COMPANY_ID --json` (or the Paperclip URLs).
-3. An existing Retina checkout. Keep the key on the **Paperclip server process environment or secure per-agent secret binding** as `HORMOZ_API_KEY`; the Retina `.env` file is NOT read automatically by Paperclip.
-4. Current Paperclip releases need Node.js 24+; the Retina scripts themselves support Node.js 22+.
-
-## Preview the setup
+## Preview only (default: Codex)
 
     cd retina
     git pull origin master
     npm test
     npm run paperclip
 
-Dry-run creates no Paperclip agents and no instruction files. Model defaults come from Retina `opencode.json`. To change an agent model first, run:
+The preview has no side effects. It uses the `codex_local` **Legacy** adapter with ACP engine, default `gpt-6.1-sol`, an existing Retina role-specific instructions path, and `dangerouslyBypassApprovalsAndSandbox: false`. No Hormouz/OpenAI API key is added to the payload.
 
-    npm run models -- set coder PROVIDER/MODEL-ID
-    npm run paperclip
+To select another model that your CLI and Plus plan support, use `npm run paperclip -- --codex-model MODEL_ID` and the same flag when installing.
 
-Use a model ID actually supported by Hormouz. No unverified model names are imposed by the installer.
+## Create six specialists under the existing Paperclip CEO
 
-## Add the six roles beneath your existing CEO
+Find the existing identifiers in Paperclip and run:
 
+    paperclipai agent list --company-id COMPANY_ID --json
     npm run paperclip -- --company-id COMPANY_ID --ceo-id CEO_AGENT_ID --apply
 
-The installer checks that the given CEO is present and has role `ceo`, and refuses an exact matching agent name to prevent accidental duplicates. It then generates ignored instruction files under `.retina/paperclip/instructions/` and calls the authenticated `paperclipai agent create` command for each role. Apply once; running it again intentionally stops on duplicates. Importing roles does not create another CEO or another Paperclip company.
+This registers **Retina Discovery, Retina Project Manager, Retina Orchestrator, Retina Coder, Retina Reviewer 1 and Retina Reviewer 2**. The installer refuses duplicate names and verifies the existing CEO belongs to the selected company. It writes instructions into the ignored `.retina/paperclip/instructions` directory. Scheduled heartbeats are requested off until the first live tests. The installer uses `--runner legacy` so classic `instructionsFilePath` works; macOS would otherwise default to the experimental Paperclip Runner.
 
-The installer explicitly uses `--runner legacy` to select `opencode_local` on macOS. This is important: Paperclip's documented `PAPERCLIP_OPENCODE_PROVIDERS` custom-provider override and `instructionsFilePath` are legacy-only options. The OpenCode Runner uses a separate runtime/connection configuration.
+After creating the roles, open **Agents → Harness / Runtime** for each one, ensure the subscription connection is selected, and run **Test your agent**. Configure a Paperclip Project workspace pointing at the actual application repository, then assign a small harmless test task. Keep the existing CEO and append the following delegation policy to its instructions:
 
-Each worker receives:
-- Its own selectable OpenCode alias `hormoz/ROLE`, mapped by `modelID` to the exact upstream Hormouz model.
-- `PAPERCLIP_OPENCODE_PROVIDERS` containing the official `@ai-sdk/openai-compatible` custom-provider shape with the endpoint `https://api.hormouz.net/v1`.
-- A credential reference `{env:HORMOZ_API_KEY}`: the API key value is never embedded in the exported config.
-- An auxiliary model alias `hormoz/sonnet` and `OPENCODE_ALLOW_ALL_MODELS=true` for gateway-only model identifiers.
-- Its existing Retina role instructions, and the shared Retina engineering rules for Coder and Reviewers.
-- Scheduled heartbeats disabled by default, until you test the setup and enable them.
+> Use Retina Discovery for human-approved requirements, Retina PM for planning, Retina Orchestrator for single-task technical coordination, Retina Coder for implementation, and the two Retina Reviewers for independent code review. Paperclip is the only assignment and scheduling authority. Jira and Gerrit operations require verified integrations. Humans decide product scope, architecture and high-risk merges.
 
-**Security:** Paperclip currently applies custom-provider overrides in this legacy configuration only when `dangerouslySkipPermissions=true`. That enables unattended tool and shell actions. Use a dedicated, constrained project checkout, configure per-agent budgets and Paperclip permissions, and do not give this setup sensitive company workspaces or credentials until you have validated its isolation.
+## Previously imported Hormouz agents
 
-## After creation
+If the six Retina roles were already created using the earlier installer, **do not run `--apply` again**. The script rejects duplicate roles. Instead open each existing agent's **Harness / Runtime**, switch its adapter to Codex, choose the saved ChatGPT subscription connection and a supported model, and preserve the role's original instructions and Reports-to link. Run the environment test for every role. This repository does not remotely migrate your installed Paperclip agents or sign in to your ChatGPT account.
 
-1. Open Paperclip → Agents → each Retina role → Harness / Runtime.
-2. Check the working machine, OpenCode (Legacy), per-role model, and the `HORMOZ_API_KEY` secret available to that agent.
-3. Run **Test your agent** for each role. The test requires a valid key and real provider response.
-4. Configure a Paperclip **Project workspace** pointing to the actual application repository to be developed, not to the Retina control repository unless that is intentional.
-5. In your current CEO's Identity/AGENTS.md, append the following policy, keeping all existing Paperclip instructions:
+## Optional fallback to Hormouz
 
-> Delegate requirement clarification to Retina Discovery, implementation planning to Retina Project Manager, single-task technical coordination to Retina Orchestrator, code changes to Retina Coder and independent reviews to Retina Reviewer 1 and Reviewer 2. Keep Paperclip as the sole task and run orchestrator. Do not claim unverified Jira/Gerrit actions. Ask the human for product, architecture, requirements or risk decisions.
+    npm run paperclip -- --runtime hormouz
+    npm run paperclip -- --runtime hormouz --company-id COMPANY_ID --ceo-id CEO_AGENT_ID --apply
 
-6. Assign a small harmless task through Paperclip and confirm it reaches the appropriate role. Enable any scheduled heartbeats only after verification.
+This uses the previous OpenCode legacy adapter and requires a separately configured `HORMOZ_API_KEY`. A role model can be set with `npm run models -- set coder PROVIDER/MODEL_ID`. The Hormouz path enables unattended OpenCode tools; keep it in a trusted, isolated workspace.
 
-## About Grafana and costs
+## Costs, monitoring and safeguards
 
-Paperclip owns Paperclip-launched Agent runs and offers run-level usage and accounting. The previous standalone Retina Grafana event collector only counts executions made via `npm run local:opencode`. It does **not** automatically account for Paperclip-launched workers. Do not run both schedulers on the same task or assume the old Grafana totals include Paperclip.
+Paperclip is now the source of truth for its agent runs, usage and quota. ChatGPT Plus is quota-based rather than a metered API account: dollar cost shown as zero for included Codex runs must not be interpreted as zero usage. Paperclip's **OpenAI connector → Usage → Check usage** shows provider limits and resets.
 
-Bridging Paperclip's run data and its provider billing into Retina Grafana is separate work; actual settled Hormouz cost requires provider billing receipts, not an estimated generic model rate.
+Retina's old Grafana exporter tracks standalone OpenCode wrapper runs only and does **not** see Paperclip-managed Codex sessions. You do not need it for the initial Paperclip setup.
 
-## Troubleshooting
+Retina does not automatically connect Jira or Gerrit. Keep task review/approval and project workspace permissions appropriately constrained.
 
-- Model unavailable: verify `PAPERCLIP_OPENCODE_PROVIDERS` and your exact Hormouz `modelID`; run `Test your agent`.
-- 401/403: set `HORMOZ_API_KEY` in Paperclip's runtime, not just Retina `.env`.
-- Wrong checkout: set the **Paperclip Project workspace**; the agent `cwd` field is deprecated.
-- Existing agent: the installer refuses duplicates. Edit the existing agent instead.
-- No Jira/Gerrit action: connect and authorize those services separately.
-
-Reference: https://docs.paperclip.ing/reference/adapters/opencode/
-Reference: https://docs.paperclip.ing/reference/cli/agent/
-Reference: https://opencode.ai/docs/models
+Sources:
+- https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan
+- https://docs.paperclip.ing/connectors/openai/
+- https://docs.paperclip.ing/reference/adapters/codex/
+- https://docs.paperclip.ing/reference/cli/agent/
