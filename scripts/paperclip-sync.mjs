@@ -97,17 +97,8 @@ function prepareManaged(id,role,action) {
     throw new Error(role+': managed instructions differ from Git. Use --prefer-retina or --prefer-paperclip explicitly.');
   }
   if(flag('prefer-retina')&&flag('prefer-paperclip'))throw new Error('Choose exactly one instruction source');
-  if(action==='link' && flag('apply')){
-    const backups=path.join(root,'.retina','paperclip','backups');
-    mkdirSync(backups,{recursive:true,mode:0o700});
-    writeFileSync(path.join(backups,role+'-before-link.md'),remote,{mode:0o600});
-    if(remote!==current && flag('prefer-paperclip')) {
-      writeFileSync(instructionPath(root,role),remote,{mode:0o600});
-    }
-  } else if(action==='save' && remote!==current && flag('prefer-paperclip')) {
-    writeFileSync(instructionPath(root,role),remote,{mode:0o600});
-  }
-  return {external:false, differs:remote!==current};
+  // Pure preflight: no files change until all six agents have been checked.
+  return {external:false,differs:remote!==current,remote};
 }
 function publish() {
   // Commit only the managed role tree; do not include other staged or untracked work.
@@ -164,7 +155,7 @@ function main() {
     const operations=[];
     for(const row of rows){
       const stateBundle=prepareManaged(row.id,row.role,'link');
-      operations.push({row,external:stateBundle.external});
+      operations.push({row,...stateBundle});
       console.log(row.role + ': ' + (stateBundle.external?'already linked':'will link external Git instructions'));
     }
     if(!flag('apply')){
@@ -173,6 +164,12 @@ function main() {
     }
     for(const op of operations){
       if(!op.external){
+        const backups=path.join(root,'.retina','paperclip','backups');
+        mkdirSync(backups,{recursive:true,mode:0o700});
+        writeFileSync(path.join(backups,op.row.role+'-before-link.md'),op.remote,{mode:0o600});
+        if(op.differs && flag('prefer-paperclip')){
+          writeFileSync(instructionPath(root,op.row.role),op.remote,{mode:0o600});
+        }
         callCli(['agent','instructions-bundle:update',op.row.id,'--payload-json',
           JSON.stringify({mode:'external',rootPath:roleDirectory(root,op.row.role),
             entryFile:'AGENTS.md',requireExistingEntry:true})],{json:false});
@@ -202,9 +199,12 @@ function main() {
         throw new Error(row.role+': both Paperclip and Git changed settings. Resolve explicitly before saving.');
       }
       const preserveLocal=Boolean(local && baseline && !equal(local,baseline) && equal(row.live,baseline));
-      operations.push({...row,preserveLocal});
+      operations.push({...row,preserveLocal,source});
     }
     for(const op of operations){
+      if(op.source?.differs && flag('prefer-paperclip')) {
+        writeFileSync(instructionPath(root,op.role),op.source.remote,{mode:0o600});
+      }
       if(!op.preserveLocal)writeFileSync(op.filenameSettings,JSON.stringify(op.live,null,2)+'\n');
       state.roles[op.role]={id:op.id,baseline:op.live};
       console.log(op.role+': '+(op.preserveLocal?'kept unpushed local changes':'captured Paperclip settings'));
