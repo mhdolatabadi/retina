@@ -14,6 +14,10 @@
     "models": "node scripts/models-local.mjs",
     "dashboard": "node src/dashboard-server.js",
     "task": "node scripts/attribution-local.mjs",
-    "paperclip": "node scripts/paperclip-setup.mjs"
+    "paperclip": "node scripts/paperclip-setup.mjs",
+    "paperclip:sync": "node scripts/paperclip-sync.mjs",
+    "paperclip:save": "node scripts/paperclip-sync.mjs save",
+    "paperclip:publish": "node scripts/paperclip-sync.mjs save --publish",
+    "paperclip:apply": "node scripts/paperclip-sync.mjs apply"
   }
 }
