@@ -13,6 +13,7 @@
     "local:opencode": "node --env-file=.env scripts/opencode-local.mjs",
     "models": "node scripts/models-local.mjs",
     "dashboard": "node src/dashboard-server.js",
-    "task": "node scripts/attribution-local.mjs"
+    "task": "node scripts/attribution-local.mjs",
+    "paperclip": "node scripts/paperclip-setup.mjs"
   }
 }

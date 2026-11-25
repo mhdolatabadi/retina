@@ -58,7 +58,8 @@ export function buildPaperclipPlans({
         // There are no API keys in the payload: the host resolves HORMOZ_API_KEY.
         env: {
           PAPERCLIP_OPENCODE_PROVIDERS: JSON.stringify(provider),
-          PAPERCLIP_OPENCODE_SMALL_MODEL: 'hormoz/sonnet'
+          PAPERCLIP_OPENCODE_SMALL_MODEL: 'hormoz/sonnet',
+          OPENCODE_ALLOW_ALL_MODELS: 'true'
         },
         // Required by the gateway-override behavior of Paperclip's legacy adapter.
         dangerouslySkipPermissions: true
@@ -71,7 +72,7 @@ export function buildPaperclipPlans({
   });
 }
 
-export function preparePaperclipInstructions(agentSource, role) {
+export function preparePaperclipInstructions(agentSource, role, engineeringRules = '') {
   const frontMatter = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
   const text = agentSource.replace(frontMatter, '').trim();
   if (!text) throw new Error('Missing Retina instructions for ' + role);
@@ -88,6 +89,8 @@ export function preparePaperclipInstructions(agentSource, role) {
     '## Role instructions',
     '',
     text,
-    ''
+    '',
+    ...(engineeringRules && (role === 'coder' || role.startsWith('reviewer-'))
+      ? ['## Common Retina engineering rules', '', engineeringRules.trim(), ''] : [])
   ].join('\n');
 }

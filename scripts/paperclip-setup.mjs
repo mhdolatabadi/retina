@@ -63,10 +63,11 @@ function main() {
   if (ceoRecord.role !== 'ceo') throw new Error('Given --ceo-id does not refer to a CEO agent');
   const directory=path.join(root,'.retina','paperclip','instructions');
   mkdirSync(directory,{recursive:true,mode:0o700});
+  const engineeringRules=readFileSync(path.join(root,'AGENTS.md'),'utf8');
   for(const plan of plans) {
     const source=readFileSync(path.join(root,'.opencode','agents',plan.role+'.md'),'utf8');
     writeFileSync(path.join(directory,plan.role+'.md'),
-      preparePaperclipInstructions(source,plan.role),{mode:0o600});
+      preparePaperclipInstructions(source,plan.role,engineeringRules),{mode:0o600});
   }
   for(const plan of plans) {
     console.log('Creating ' + plan.payload.name + '...');
