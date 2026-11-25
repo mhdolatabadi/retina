@@ -54,3 +54,9 @@ Each Retina specialist's canonical instructions are now in **`paperclip/agents/<
 Use `--prefer-paperclip` instead when you want to import customized Paperclip instructions. After changing agents, run `npm run paperclip:save` to pull portable settings (model, title, budget), and `npm run paperclip:publish` to commit and push the six role directories. Run `npm run paperclip:apply -- --apply` to send safe Git settings updates back to Paperclip with revision guards. **Inspect tracked files before pushing: this repository is public.**
 
 See [Paperclip Git-backed synchronization](docs/paperclip-git-sync.md) for required local access, ownership boundaries, conflicts and security limitations.
+
+## Native memory and independent review
+
+Retina's existing Discovery, PM, Orchestrator, Coder, and two Reviewer roles now share an explicit policy for **approved decision memory** and **cold-reading critique**. Decisions live in the *target product repository* at `docs/retina/decisions/<id>.json`. Reviewers receive the current artifact and only selected approved decisions and source references; full author conversation must not be forwarded. Fresh run isolation remains an operational check, not an assumption.
+
+Optional helper: `npm run context -- decisions --workspace /absolute/product/path` and `npm run context -- pack --workspace /absolute/product/path --role reviewer-1 --artifact docs/designs/feature.md --decision DEC-104`. This creates a local artifact, not a Paperclip run. See [native context and independent critique](docs/reasoning.md).
