@@ -35,11 +35,13 @@ export function buildPaperclipProvider(base, overrides = {}) {
 
 export function buildPaperclipPlans({
   base, overrides = {}, root, ceoId,
-  roleBudgets = {}
+  roleBudgets = {}, runtime = 'codex', codexModel = 'gpt-6.1-sol'
 }) {
   if (!path.isAbsolute(root)) throw new Error('Retina root must be an absolute directory');
   if (typeof ceoId !== 'string' || !ceoId.trim()) throw new Error('Existing Paperclip CEO ID is required');
-  const provider = buildPaperclipProvider(base, overrides);
+  if (runtime !== 'codex' && runtime !== 'hormouz') throw new Error('Runtime must be codex or hormouz');
+  if (runtime === 'codex') validateUpstreamModel(codexModel);
+  const provider = runtime === 'hormouz' ? buildPaperclipProvider(base, overrides) : null;
   return RETINA_ROLES.map(role => {
     const budget = roleBudgets[role];
     if (budget !== undefined && (!Number.isInteger(budget) || budget < 0)) {
@@ -50,25 +52,29 @@ export function buildPaperclipPlans({
       role: role === 'coder' ? 'engineer' : 'general',
       title: role === 'project-manager' ? 'Requirements-backed delivery planning' : 'Retina ' + role,
       reportsTo: ceoId,
-      adapterType: 'opencode_local',
-      adapterConfig: {
-        model: 'hormoz/' + role,
-        instructionsFilePath: path.join(root, '.retina', 'paperclip', 'instructions', role + '.md'),
-        // Legacy OpenCode adapter merges this provider into an ephemeral config.
-        // There are no API keys in the payload: the host resolves HORMOZ_API_KEY.
-        env: {
-          PAPERCLIP_OPENCODE_PROVIDERS: JSON.stringify(provider),
-          PAPERCLIP_OPENCODE_SMALL_MODEL: 'hormoz/sonnet',
-          OPENCODE_ALLOW_ALL_MODELS: 'true'
-        },
-        // Required by the gateway-override behavior of Paperclip's legacy adapter.
-        dangerouslySkipPermissions: true
-      },
+      adapterType: runtime === 'codex' ? 'codex_local' : 'opencode_local',
+      adapterConfig: runtime === 'codex'
+        ? {
+            model: codexModel,
+            engine: 'acp',
+            instructionsFilePath: path.join(root, '.retina', 'paperclip', 'instructions', role + '.md'),
+            dangerouslyBypassApprovalsAndSandbox: false
+          }
+        : {
+            model: 'hormoz/' + role,
+            instructionsFilePath: path.join(root, '.retina', 'paperclip', 'instructions', role + '.md'),
+            env: {
+              PAPERCLIP_OPENCODE_PROVIDERS: JSON.stringify(provider),
+              PAPERCLIP_OPENCODE_SMALL_MODEL: 'hormoz/sonnet',
+              OPENCODE_ALLOW_ALL_MODELS: 'true'
+            },
+            dangerouslySkipPermissions: true
+          },
       runtimeConfig: { heartbeat: { enabled: false, wakeOnDemand: true } },
       permissions: { canCreateAgents: false, canCreateSkills: false }
     };
     if (budget !== undefined) payload.budgetMonthlyCents = budget;
-    return {role, payload, upstreamModel: provider.hormoz.models[role].modelID};
+    return {role, payload, upstreamModel: runtime === 'codex' ? codexModel : provider.hormoz.models[role].modelID};
   });
 }
 
