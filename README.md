@@ -44,3 +44,13 @@ Run-scoped telemetry now excludes unrelated corporate OpenCode sessions. The pri
 ## Use Retina inside Paperclip (ChatGPT Plus by default)
 
 Retina's six specialist agents can run under an **existing Paperclip CEO** with the official **Codex + ChatGPT subscription** connection (no Hormouz or OpenAI API key). In Paperclip, choose **Connectors → OpenAI → Subscription** and complete the browser login. Preview with `npm run paperclip` and apply with `npm run paperclip -- --company-id COMPANY_ID --ceo-id CEO_AGENT_ID --apply`. If you already imported the six roles using Hormouz, change their runtime in Paperclip instead of creating duplicates. For optional legacy Hormouz, select `--runtime hormouz`. Details: [Paperclip integration](docs/paperclip-integration.md).
+
+## Keep Paperclip Agent changes in Retina
+
+Each Retina specialist's canonical instructions are now in **`paperclip/agents/<role>/AGENTS.md`**, tracked by Git. To make changes from the Paperclip **Identity** UI edit the same files, link them once:
+
+    npm run paperclip:sync -- link --company-id COMPANY_ID --apply --prefer-retina
+
+Use `--prefer-paperclip` instead when you want to import customized Paperclip instructions. After changing agents, run `npm run paperclip:save` to pull portable settings (model, title, budget), and `npm run paperclip:publish` to commit and push the six role directories. Run `npm run paperclip:apply -- --apply` to send safe Git settings updates back to Paperclip with revision guards. **Inspect tracked files before pushing: this repository is public.**
+
+See [Paperclip Git-backed synchronization](docs/paperclip-git-sync.md) for required local access, ownership boundaries, conflicts and security limitations.
