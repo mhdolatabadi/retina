@@ -33,7 +33,8 @@ test('default Paperclip runtime runs six roles under existing CEO using Codex su
     assert.equal(p.adapterConfig.dangerouslyBypassApprovalsAndSandbox,false);
     assert.equal(p.adapterConfig.env,undefined);
     assert.ok(!JSON.stringify(p).includes('OPENAI_API_KEY'));
-    assert.ok(p.adapterConfig.instructionsFilePath.endsWith('/'+item.role+'.md'));
+    assert.ok(p.adapterConfig.instructionsFilePath.endsWith('/paperclip/agents/'+item.role+'/AGENTS.md'));
+    assert.ok(readFileSync(p.adapterConfig.instructionsFilePath,'utf8').includes('Retina'));
     assert.equal(p.runtimeConfig.heartbeat.enabled,false);
     assert.equal(p.permissions.canCreateAgents,false);
   }

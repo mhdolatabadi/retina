@@ -57,12 +57,12 @@ export function buildPaperclipPlans({
         ? {
             model: codexModel,
             engine: 'acp',
-            instructionsFilePath: path.join(root, '.retina', 'paperclip', 'instructions', role + '.md'),
+            instructionsFilePath: path.join(root, 'paperclip', 'agents', role, 'AGENTS.md'),
             dangerouslyBypassApprovalsAndSandbox: false
           }
         : {
             model: 'hormoz/' + role,
-            instructionsFilePath: path.join(root, '.retina', 'paperclip', 'instructions', role + '.md'),
+            instructionsFilePath: path.join(root, 'paperclip', 'agents', role, 'AGENTS.md'),
             env: {
               PAPERCLIP_OPENCODE_PROVIDERS: JSON.stringify(provider),
               PAPERCLIP_OPENCODE_SMALL_MODEL: 'hormoz/sonnet',

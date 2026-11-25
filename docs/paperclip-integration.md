@@ -27,7 +27,7 @@ Find the existing identifiers in Paperclip and run:
     paperclipai agent list --company-id COMPANY_ID --json
     npm run paperclip -- --company-id COMPANY_ID --ceo-id CEO_AGENT_ID --apply
 
-This registers **Retina Discovery, Retina Project Manager, Retina Orchestrator, Retina Coder, Retina Reviewer 1 and Retina Reviewer 2**. The installer refuses duplicate names and verifies the existing CEO belongs to the selected company. It writes instructions into the ignored `.retina/paperclip/instructions` directory. Scheduled heartbeats are requested off until the first live tests. The installer uses `--runner legacy` so classic `instructionsFilePath` works; macOS would otherwise default to the experimental Paperclip Runner.
+This registers **Retina Discovery, Retina Project Manager, Retina Orchestrator, Retina Coder, Retina Reviewer 1 and Retina Reviewer 2**. The installer refuses duplicate names and verifies the existing CEO belongs to the selected company. It writes instructions into the ignored `paperclip/agents/<role>/AGENTS.md` directory. Scheduled heartbeats are requested off until the first live tests. The installer uses `--runner legacy` so classic `instructionsFilePath` works; macOS would otherwise default to the experimental Paperclip Runner.
 
 After creating the roles, open **Agents → Harness / Runtime** for each one, ensure the subscription connection is selected, and run **Test your agent**. Configure a Paperclip Project workspace pointing at the actual application repository, then assign a small harmless test task. Keep the existing CEO and append the following delegation policy to its instructions:
 
@@ -57,3 +57,7 @@ Sources:
 - https://docs.paperclip.ing/connectors/openai/
 - https://docs.paperclip.ing/reference/adapters/codex/
 - https://docs.paperclip.ing/reference/cli/agent/
+
+## Keep all Retina agent edits in Git
+
+Instructions are now canonical at `paperclip/agents/<role>/AGENTS.md` and the setup script never regenerates them. To link Paperclip Identity edits to these tracked files, use `npm run paperclip:sync -- link --company-id COMPANY_ID --apply --prefer-retina` (or `--prefer-paperclip` to bring a customized managed prompt into Git). Run `npm run paperclip:save` to snapshot portable model/title/budget settings; use `npm run paperclip:publish` to commit and push only the role files. Details and conflicts: [Paperclip Git-backed agent sync](paperclip-git-sync.md).
