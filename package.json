@@ -18,6 +18,7 @@
     "paperclip:sync": "node scripts/paperclip-sync.mjs",
     "paperclip:save": "node scripts/paperclip-sync.mjs save",
     "paperclip:publish": "node scripts/paperclip-sync.mjs save --publish",
-    "paperclip:apply": "node scripts/paperclip-sync.mjs apply"
+    "paperclip:apply": "node scripts/paperclip-sync.mjs apply",
+    "context": "node scripts/context.mjs"
   }
 }
