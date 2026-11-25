@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readRoleModelOverrides } from '../src/role-models.js';
-import { buildPaperclipPlans, preparePaperclipInstructions } from '../src/paperclip-plans.js';
+import { buildPaperclipPlans } from '../src/paperclip-plans.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -67,13 +67,11 @@ function main() {
   const ceoRecord=existing.find(row=>row.id===ceo);
   if (!ceoRecord) throw new Error('CEO ID not found in this company; no agents created');
   if (ceoRecord.role !== 'ceo') throw new Error('Given --ceo-id does not refer to a CEO agent');
-  const directory=path.join(root,'.retina','paperclip','instructions');
-  mkdirSync(directory,{recursive:true,mode:0o700});
-  const engineeringRules=readFileSync(path.join(root,'AGENTS.md'),'utf8');
-  for(const plan of plans) {
-    const source=readFileSync(path.join(root,'.opencode','agents',plan.role+'.md'),'utf8');
-    writeFileSync(path.join(directory,plan.role+'.md'),
-      preparePaperclipInstructions(source,plan.role,engineeringRules),{mode:0o600});
+  // Source-of-truth prompts live in Git: never regenerate or overwrite operator edits.
+  for (const plan of plans) {
+    if (!existsSync(plan.payload.adapterConfig.instructionsFilePath)) {
+      throw new Error('Missing tracked role instructions: ' + plan.payload.adapterConfig.instructionsFilePath);
+    }
   }
   for(const plan of plans) {
     console.log('Creating ' + plan.payload.name + '...');
