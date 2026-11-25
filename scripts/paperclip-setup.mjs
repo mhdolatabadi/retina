@@ -15,6 +15,8 @@ const get = name => {
 const apply = args.includes('--apply');
 const company = get('company-id');
 const ceo = get('ceo-id');
+const runtime = get('runtime') || 'codex';
+const codexModel = get('codex-model') || 'gpt-6.1-sol';
 
 function runCommand(argv, {json = false} = {}) {
   const result = spawnSync('paperclipai', argv, {encoding: 'utf8', shell: false, maxBuffer: 4 * 1024 * 1024});
@@ -39,18 +41,22 @@ function agentList(json) {
 }
 function main() {
   if (args.includes('--help')) {
-    console.log('Usage: node scripts/paperclip-setup.mjs --company-id ID --ceo-id EXISTING_CEO_ID [--apply]');
+    console.log('Usage: node scripts/paperclip-setup.mjs [--runtime codex|hormouz] [--codex-model MODEL] --company-id ID --ceo-id EXISTING_CEO_ID [--apply]');
+    console.log('Default: Codex with ChatGPT subscription; authenticate in Paperclip Connectors > OpenAI.');
     console.log('Default is dry-run. --apply creates six new agents via the authenticated Paperclip CLI.');
     return;
   }
   if (apply && (!company || !ceo)) throw new Error('--apply needs --company-id and --ceo-id');
   const base=JSON.parse(readFileSync(path.join(root,'opencode.json'),'utf8'));
-  const overrides=readRoleModelOverrides(path.join(root,'.retina','role-models.json'));
-  const plans=buildPaperclipPlans({base,overrides,root,ceoId:ceo || 'EXISTING-CEO-ID'});
+  const overrides=runtime === 'hormouz'
+    ? readRoleModelOverrides(path.join(root,'.retina','role-models.json')) : {};
+  const plans=buildPaperclipPlans({base,overrides,root,ceoId:ceo || 'EXISTING-CEO-ID',runtime,codexModel});
+  console.log('Selected runtime: ' + runtime + (runtime === 'codex' ? ' (ChatGPT subscription; no OpenAI API key)' : ' (Hormouz key required)'));
   for(const row of plans) console.log(row.payload.name + ' -> ' + row.payload.adapterConfig.model + ' (' + row.upstreamModel + ')');
   if (!apply) {
     console.log('\nDRY RUN ONLY: no Paperclip agents or files were created.');
     console.log('Pass --company-id and --ceo-id, then --apply to create agents under your existing CEO.');
+    if (runtime === 'codex') console.log('Sign in first at Paperclip > Connectors > OpenAI > Subscription.');
     return;
   }
   // Fail before writing even one agent if the CLI fails or a matching name exists.
@@ -76,7 +82,7 @@ function main() {
       '--payload-json',JSON.stringify(plan.payload)
     ]);
   }
-  console.log('Created six paused-by-default agents. Open Paperclip to verify each runtime and its credentials.');
+  console.log('Created six agents with scheduled heartbeats disabled in requested config. Verify adapter and subscription connection in Paperclip.');
   console.log('Assign a small test task before enabling scheduled heartbeats.');
 }
 try {main();}
