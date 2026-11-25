@@ -40,3 +40,7 @@ In one terminal run `npm run dashboard`, and open http://127.0.0.1:4318. In anot
 ## Grafana Observability (recommended)
 
 Run-scoped telemetry now excludes unrelated corporate OpenCode sessions. The primary monitoring stack is provisioned Grafana + Prometheus, with token usage and Hormouz tariff-cost charts by agent role, model, Jira issue and task type. Add GRAFANA_ADMIN_PASSWORD to ignored .env and run: docker compose -f compose.grafana.yml up -d. Open http://127.0.0.1:3000. More: [Grafana Observability](docs/grafana-observability.md). Tariff costs are not settled bills; missing cache prices are not invented.
+
+## Use Retina inside Paperclip
+
+Retina can be installed as six specialized OpenCode/Hormouz agents under your **existing Paperclip CEO**, with Paperclip retaining the only task/run manager. Preview with `npm run paperclip`; apply with `npm run paperclip -- --company-id COMPANY_ID --ceo-id CEO_AGENT_ID --apply`. Uses the classic OpenCode adapter because Hormouz's custom provider routing is currently documented for that adapter. See [Paperclip integration](docs/paperclip-integration.md) for credentials, permissions and limits. This installs agent definitions when run locally; it does not connect to an unknown Paperclip instance from GitHub.
